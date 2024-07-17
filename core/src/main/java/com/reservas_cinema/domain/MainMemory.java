@@ -15,19 +15,26 @@ public class MainMemory {
   public Long writeItem(int address, Long value) { return data.set(address, value); }
 
   public List<Long> readBlock(int blockNumber) {
-    List<Long> block = new LinkedList<>();
-
-    for (int i = firstAddress(blockNumber); i <= lastAddress(blockNumber); i++)
-      block.add(data.get(i));
-
-    return block;
+    return readListOfItems(firstAddress(blockNumber), addressesPerBlock);
   }
 
   public void writeBlock(int blockNumber, List<Long> block) {
-    for (int i = firstAddress(blockNumber), j = 0; i <= lastAddress(blockNumber); i++, j++)
-      data.set(i, block.get(j));
+    writeListOfItems(firstAddress(blockNumber), block);
+  }
+
+  public List<Long> readListOfItems(int address, int amount) {
+    List<Long> items = new LinkedList<>();
+    
+    for (int i = 0; i < amount; i++)
+      items.add(readItem(address + i));
+    
+    return items;
+  }
+
+  public void writeListOfItems(int address, List<Long> items) {
+    for (int i = 0; i < items.size(); i++)
+      writeItem(address + i, items.get(i));
   }
 
   private int firstAddress(int blockNumber) { return blockNumber * addressesPerBlock; }
-  private int lastAddress(int blockNumber) { return firstAddress(blockNumber) + addressesPerBlock - 1; }
 }
