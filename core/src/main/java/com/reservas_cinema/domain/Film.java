@@ -4,19 +4,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 public record Film(
-  int id,
+  long id,
   String title,
   String description,
-  int duration,
+  long duration,
   List<Session> sessions
 ) implements Serializable {
   public List<Long> serialize() {
     List<Long> serialization = new LinkedList<>();
 
-    serialization.add((long) id);
+    serialization.add(id);
     serialization.addAll(serializeSequence(title));
     serialization.addAll(serializeSequence(description));
-    serialization.add((long) duration);
+    serialization.add(duration);
 
     sessions.forEach((session) -> serialization.addAll(session.serialize()));
 

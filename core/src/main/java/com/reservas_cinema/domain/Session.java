@@ -5,15 +5,15 @@ import java.util.List;
 
 public record Session(
   Room room,
-  int showTime,
-  int dayOfWeek
+  long showTime,
+  long dayOfWeek
 ) implements Serializable {
   public List<Long> serialize() {
     List<Long> serialization = new LinkedList<>();
     
     serialization.addAll(room.serialize());
-    serialization.add((long) showTime);
-    serialization.add((long) dayOfWeek);
+    serialization.add(showTime);
+    serialization.add(dayOfWeek);
 
     return serialization;
   }

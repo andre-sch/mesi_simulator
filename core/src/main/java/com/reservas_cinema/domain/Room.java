@@ -4,17 +4,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 public record Room(
-  int id,
-  int numberOfRows,
-  int seatsPerRow,
+  long id,
+  long numberOfRows,
+  long seatsPerRow,
   List<Seat> seats
 ) implements Serializable {
   public List<Long> serialize() {
     List<Long> serialization = new LinkedList<>();
 
-    serialization.add((long) id);
-    serialization.add((long) numberOfRows);
-    serialization.add((long) seatsPerRow);
+    serialization.add(id);
+    serialization.add(numberOfRows);
+    serialization.add(seatsPerRow);
 
     seats.forEach((seat) -> serialization.addAll(seat.serialize()));
     
