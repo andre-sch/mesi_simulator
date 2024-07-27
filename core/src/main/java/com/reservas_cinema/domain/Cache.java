@@ -54,6 +54,13 @@ record Line(
 ) {}
 
 record Tag(
-  int blockNumber
-  // todo: include MESI protocol status
+  int blockNumber,
+  ProtocolStatus status
 ) {}
+
+enum ProtocolStatus {
+  MODIFIED,
+  EXCLUSIVE,
+  SHARED,
+  INVALID
+}
