@@ -37,34 +37,34 @@ public class Cache {
     var internalCacheLookup = readFromCache(blockNumber);
     if (internalCacheLookup.isPresent()) {
       eventDispatcher.dispatch(new ReadHit(blockNumber));
-      return internalCacheLookup.get().content();
+      var line = internalCacheLookup.get();
+      return line.getContent();
     }
 
     var externalCacheLookup = bidirectionalEventDispatcher.dispatch(new ReadMiss(blockNumber));
     var status = externalCacheLookup.isPresent() && externalCacheLookup.get().isSuccessful()
       ? ProtocolStatus.SHARED : ProtocolStatus.EXCLUSIVE;
 
-    var cacheLine = loadBlockInCache(blockNumber);
-    cacheLine.setStatus(status);
+    var line = loadBlockInCache(blockNumber);
+    line.setStatus(status);
 
-    return cacheLine.content();
+    return line.getContent();
   }
 
   private Optional<Line> readFromCache(int blockNumber) {
     for (var line : data) {
-      boolean isPresent = line.tag().blockNumber() == blockNumber;
+      boolean isPresent = line.getBlockNumber() == blockNumber;
       if (isPresent) return Optional.of(line);
     }
 
     return Optional.empty();
   }
 
-  public Line loadBlockInCache(int blockNumber) {
+  private Line loadBlockInCache(int blockNumber) {
     if (data.size() == maxLines) releaseLine();
     
-    var tag = new Tag(blockNumber);
     var content = memory.readBlock(blockNumber);
-    var line = new Line(tag, content);
+    var line = new Line(blockNumber, content);
     
     data.offer(line);
     return line;
@@ -73,8 +73,8 @@ public class Cache {
   private void releaseLine() {
     var line = data.poll();
 
-    var block = line.content();
-    var blockNumber = line.tag().blockNumber();
+    var block = line.getContent();
+    var blockNumber = line.getBlockNumber();
 
     memory.writeBlock(blockNumber, block);
   }
@@ -84,13 +84,14 @@ class Line {
   private Tag tag;
   private List<Long> content;
 
-  public Line(Tag tag, List<Long> content) {
-    this.tag = tag;
+  public Line(int blockNumber, List<Long> content) {
+    this.tag = new Tag(blockNumber);
     this.content = content;
   }
 
-  public Tag tag() { return tag; }
-  public List<Long> content() { return content; }
+  public int getBlockNumber() { return tag.blockNumber(); }
+  public ProtocolStatus getStatus() { return tag.status(); }
+  public List<Long> getContent() { return content; }
 
   public void setStatus(ProtocolStatus newStatus) {
     tag = new Tag(tag.blockNumber(), newStatus);
