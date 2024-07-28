@@ -1,6 +1,7 @@
 package com.reservas_cinema.domain;
 
 import java.util.*;
+import java.util.function.*;
 import com.reservas_cinema.domain.events.*;
 import com.reservas_cinema.domain.dispatchers.*;
 
@@ -77,6 +78,36 @@ public class Cache {
     var blockNumber = line.getBlockNumber();
 
     memory.writeBlock(blockNumber, block);
+  }
+
+  public Consumer<CacheEvent> getHandler() {
+    return (CacheEvent event) -> {
+      var internalCacheLookup = readFromCache(event.blockNumber());
+      if (internalCacheLookup.isEmpty()) return;
+      
+      var line = internalCacheLookup.get();
+
+      if (event.operation() == OperationType.WRITE)
+      line.setStatus(ProtocolStatus.INVALID);
+      
+      if (event.operation() == OperationType.READ)
+      line.setStatus(ProtocolStatus.SHARED);
+    };
+  }
+  
+  public Function<ReadMiss, DataLookup> getBidirectionalHandler() {
+    return (ReadMiss event) -> {
+      var internalCacheLookup = readFromCache(event.blockNumber());
+      var isLookupSuccessful = internalCacheLookup.isPresent();
+
+      if (isLookupSuccessful) {
+        var line = internalCacheLookup.get();
+        if (line.getStatus() == ProtocolStatus.MODIFIED)
+          memory.writeBlock(line.getBlockNumber(), line.getContent());
+      }
+
+      return new DataLookup(event.blockNumber(), isLookupSuccessful);
+    };
   }
 }
 
