@@ -49,7 +49,10 @@ public class Cache {
       return line.getContent();
     }
 
-    var externalCacheLookup = bidirectionalEventDispatcher.dispatch(new ReadMiss(blockNumber));
+    var event = new ReadMiss(blockNumber);
+
+    eventDispatcher.dispatch(event);
+    var externalCacheLookup = bidirectionalEventDispatcher.dispatch(event);
     var status = externalCacheLookup.isPresent() && externalCacheLookup.get().isSuccessful()
       ? ProtocolStatus.SHARED : ProtocolStatus.EXCLUSIVE;
 
@@ -95,10 +98,13 @@ public class Cache {
       var line = internalCacheLookup.get();
 
       if (event.operation() == OperationType.WRITE)
-      line.setStatus(ProtocolStatus.INVALID);
+        line.setStatus(ProtocolStatus.INVALID);
       
-      if (event.operation() == OperationType.READ)
-      line.setStatus(ProtocolStatus.SHARED);
+      if (event.operation() == OperationType.READ) {
+        if (line.getStatus() == ProtocolStatus.MODIFIED)
+          memory.writeBlock(line.getBlockNumber(), line.getContent());
+        line.setStatus(ProtocolStatus.SHARED);
+      }
     };
   }
   
@@ -106,12 +112,6 @@ public class Cache {
     return (ReadMiss event) -> {
       var internalCacheLookup = readFromCache(event.blockNumber());
       var isLookupSuccessful = internalCacheLookup.isPresent();
-
-      if (isLookupSuccessful) {
-        var line = internalCacheLookup.get();
-        if (line.getStatus() == ProtocolStatus.MODIFIED)
-          memory.writeBlock(line.getBlockNumber(), line.getContent());
-      }
 
       return new DataLookup(event.blockNumber(), isLookupSuccessful);
     };
