@@ -11,17 +11,28 @@ public class Cache {
 
   private final ReadHitDispatcher readHitDispatcher = new ReadHitDispatcher();
   private final ReadMissDispatcher readMissDispatcher = new ReadMissDispatcher();
+  private final WriteHitDispatcher writeHitDispatcher = new WriteHitDispatcher();
+  private final WriteMissDispatcher writeMissDispatcher = new WriteMissDispatcher();
 
   public Cache(MainMemory memory, int maxLines) {
     this.memory = memory;
     this.maxLines = maxLines;
   }
 
-  public void writeBlock(int blockNumber, List<Long> block) {
-    var storedBlock = readBlock(blockNumber);
+  public void writeBlock(int blockNumber, List<Long> newContent) {
+    Line line;
+    Optional<Line> internalCacheLookup = readFromCache(blockNumber);
 
-    storedBlock.clear();
-    storedBlock.addAll(block);
+    if (internalCacheLookup.isPresent()) {
+      line = internalCacheLookup.get();
+      writeHitDispatcher.dispatch(new WriteHit(blockNumber));
+    } else {
+      line = loadBlockInCache(blockNumber);
+      writeMissDispatcher.dispatch(new WriteMiss(blockNumber));
+    }
+
+    line.setStatus(ProtocolStatus.MODIFIED);
+    line.setContent(newContent);
   }
 
   public List<Long> readBlock(int blockNumber) {
