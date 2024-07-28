@@ -1,8 +1,8 @@
-package com.reservas_cinema.domain;
+package com.cinema_reservations.domain;
 
 import java.util.*;
-import com.reservas_cinema.domain.events.*;
-import com.reservas_cinema.domain.dispatchers.*;
+import com.cinema_reservations.domain.events.*;
+import com.cinema_reservations.domain.dispatchers.*;
 
 public class Bus {
   private final List<Cache> caches = new LinkedList<>();

@@ -1,6 +1,6 @@
-package com.reservas_cinema.domain.dispatchers;
+package com.cinema_reservations.domain.dispatchers;
 
-import com.reservas_cinema.domain.events.*;
+import com.cinema_reservations.domain.events.*;
 
 public class ReadMissDispatcher extends BidirectionalDispatcher<ReadMiss, DataLookup> {
   public ReadMissDispatcher() {

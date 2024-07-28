@@ -1,9 +1,9 @@
-package com.reservas_cinema.domain;
+package com.cinema_reservations.domain;
 
 import java.util.*;
 import java.util.function.*;
-import com.reservas_cinema.domain.events.*;
-import com.reservas_cinema.domain.dispatchers.*;
+import com.cinema_reservations.domain.events.*;
+import com.cinema_reservations.domain.dispatchers.*;
 
 public class Cache {
   private final Queue<Line> data = new LinkedList<>();

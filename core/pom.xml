@@ -6,7 +6,7 @@
 >
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.reservas_cinema</groupId>
+  <groupId>com.cinema_reservations</groupId>
   <artifactId>core</artifactId>
   <version>1.0-SNAPSHOT</version>
 

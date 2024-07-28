@@ -1,4 +1,4 @@
-package com.reservas_cinema;
+package com.cinema_reservations;
 
 public class Main {
   public static void main(String[] args) {

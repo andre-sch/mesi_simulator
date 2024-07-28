@@ -1,6 +1,6 @@
-package com.reservas_cinema.domain.events;
+package com.cinema_reservations.domain.events;
 
-public record ReadHit(
+public record ReadMiss(
   int blockNumber
 ) implements CacheEvent {
   public OperationType operation() {

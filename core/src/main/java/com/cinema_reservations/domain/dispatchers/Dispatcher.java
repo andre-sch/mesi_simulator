@@ -1,4 +1,4 @@
-package com.reservas_cinema.domain.dispatchers;
+package com.cinema_reservations.domain.dispatchers;
 
 import java.util.List;
 import java.util.LinkedList;

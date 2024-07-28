@@ -1,4 +1,4 @@
-package com.reservas_cinema.domain.events;
+package com.cinema_reservations.domain.events;
 
 public interface CacheEvent {
   public OperationType operation();
