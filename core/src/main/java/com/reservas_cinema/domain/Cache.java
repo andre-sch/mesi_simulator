@@ -9,6 +9,7 @@ public class Cache {
   private final MainMemory memory;
   private final int maxLines;
 
+  private final ReadHitDispatcher readHitDispatcher = new ReadHitDispatcher();
   private final ReadMissDispatcher readMissDispatcher = new ReadMissDispatcher();
 
   public Cache(MainMemory memory, int maxLines) {
@@ -24,26 +25,40 @@ public class Cache {
   }
 
   public List<Long> readBlock(int blockNumber) {
-    for (var line : data) {
-      var blockIsAvailable = line.tag().blockNumber() == blockNumber;
-      if (blockIsAvailable) return line.content();
+    var internalCacheLookup = readFromCache(blockNumber);
+    if (internalCacheLookup.isPresent()) {
+      readHitDispatcher.dispatch(new ReadHit(blockNumber));
+      return internalCacheLookup.get().content();
     }
 
-    return fetchBlock(blockNumber);
-  }
-
-  public List<Long> fetchBlock(int blockNumber) {
-    if (data.size() == maxLines) releaseLine();
-    
-    var dataLookup = readMissDispatcher.dispatch(new ReadMiss(blockNumber));
-    var status = dataLookup.isPresent() && dataLookup.get().isSuccessful()
+    var externalCacheLookup = readMissDispatcher.dispatch(new ReadMiss(blockNumber));
+    var status = externalCacheLookup.isPresent() && externalCacheLookup.get().isSuccessful()
       ? ProtocolStatus.SHARED : ProtocolStatus.EXCLUSIVE;
 
-    var tag = new Tag(blockNumber, status);
-    var content = memory.readBlock(blockNumber);
+    var cacheLine = loadBlockInCache(blockNumber);
+    cacheLine.setStatus(status);
+
+    return cacheLine.content();
+  }
+
+  private Optional<Line> readFromCache(int blockNumber) {
+    for (var line : data) {
+      boolean isPresent = line.tag().blockNumber() == blockNumber;
+      if (isPresent) return Optional.of(line);
+    }
+
+    return Optional.empty();
+  }
+
+  public Line loadBlockInCache(int blockNumber) {
+    if (data.size() == maxLines) releaseLine();
     
-    data.offer(new Line(tag, content));
-    return content;
+    var tag = new Tag(blockNumber);
+    var content = memory.readBlock(blockNumber);
+    var line = new Line(tag, content);
+    
+    data.offer(line);
+    return line;
   }
   
   private void releaseLine() {
@@ -56,15 +71,36 @@ public class Cache {
   }
 }
 
-record Line(
-  Tag tag,
-  List<Long> content
-) {}
+class Line {
+  private Tag tag;
+  private List<Long> content;
+
+  public Line(Tag tag, List<Long> content) {
+    this.tag = tag;
+    this.content = content;
+  }
+
+  public Tag tag() { return tag; }
+  public List<Long> content() { return content; }
+
+  public void setStatus(ProtocolStatus newStatus) {
+    tag = new Tag(tag.blockNumber(), newStatus);
+  }
+
+  public void setContent(List<Long> newContent) {
+    content.clear();
+    content.addAll(newContent);
+  }
+}
 
 record Tag(
   int blockNumber,
   ProtocolStatus status
-) {}
+) {
+  public Tag(int blockNumber) {
+    this(blockNumber, ProtocolStatus.INVALID);
+  }
+}
 
 enum ProtocolStatus {
   MODIFIED,
