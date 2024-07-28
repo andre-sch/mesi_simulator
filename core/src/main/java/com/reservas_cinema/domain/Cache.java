@@ -10,12 +10,19 @@ public class Cache {
   private final MainMemory memory;
   private final int maxLines;
 
-  private final Dispatcher<CacheEvent> eventDispatcher = new Dispatcher<>();
-  private final BidirectionalDispatcher<ReadMiss, DataLookup> bidirectionalEventDispatcher = new ReadMissDispatcher();
+  private final Dispatcher<CacheEvent> eventDispatcher;
+  private final BidirectionalDispatcher<ReadMiss, DataLookup> bidirectionalEventDispatcher;
 
-  public Cache(MainMemory memory, int maxLines) {
+  public Cache(
+    MainMemory memory,
+    int maxLines,
+    Dispatcher<CacheEvent> eventDispatcher,
+    BidirectionalDispatcher<ReadMiss, DataLookup> bidirectionalEventDispatcher
+  ) {
     this.memory = memory;
     this.maxLines = maxLines;
+    this.eventDispatcher = eventDispatcher;
+    this.bidirectionalEventDispatcher = bidirectionalEventDispatcher;
   }
 
   public void writeBlock(int blockNumber, List<Long> newContent) {
