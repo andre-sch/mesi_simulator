@@ -9,10 +9,8 @@ public class Cache {
   private final MainMemory memory;
   private final int maxLines;
 
-  private final ReadHitDispatcher readHitDispatcher = new ReadHitDispatcher();
-  private final ReadMissDispatcher readMissDispatcher = new ReadMissDispatcher();
-  private final WriteHitDispatcher writeHitDispatcher = new WriteHitDispatcher();
-  private final WriteMissDispatcher writeMissDispatcher = new WriteMissDispatcher();
+  private final Dispatcher<CacheEvent> eventDispatcher = new Dispatcher<>();
+  private final BidirectionalDispatcher<ReadMiss, DataLookup> bidirectionalEventDispatcher = new ReadMissDispatcher();
 
   public Cache(MainMemory memory, int maxLines) {
     this.memory = memory;
@@ -25,10 +23,10 @@ public class Cache {
 
     if (internalCacheLookup.isPresent()) {
       line = internalCacheLookup.get();
-      writeHitDispatcher.dispatch(new WriteHit(blockNumber));
+      eventDispatcher.dispatch(new WriteHit(blockNumber));
     } else {
       line = loadBlockInCache(blockNumber);
-      writeMissDispatcher.dispatch(new WriteMiss(blockNumber));
+      eventDispatcher.dispatch(new WriteMiss(blockNumber));
     }
 
     line.setStatus(ProtocolStatus.MODIFIED);
@@ -38,11 +36,11 @@ public class Cache {
   public List<Long> readBlock(int blockNumber) {
     var internalCacheLookup = readFromCache(blockNumber);
     if (internalCacheLookup.isPresent()) {
-      readHitDispatcher.dispatch(new ReadHit(blockNumber));
+      eventDispatcher.dispatch(new ReadHit(blockNumber));
       return internalCacheLookup.get().content();
     }
 
-    var externalCacheLookup = readMissDispatcher.dispatch(new ReadMiss(blockNumber));
+    var externalCacheLookup = bidirectionalEventDispatcher.dispatch(new ReadMiss(blockNumber));
     var status = externalCacheLookup.isPresent() && externalCacheLookup.get().isSuccessful()
       ? ProtocolStatus.SHARED : ProtocolStatus.EXCLUSIVE;
 
