@@ -7,8 +7,11 @@ public class MainMemory {
   private final int addressesPerBlock;
 
   public MainMemory(int numberOfAddresses, int addressesPerBlock) {
-    this.data = new ArrayList<>(numberOfAddresses);
     this.addressesPerBlock = addressesPerBlock;
+    this.data = new ArrayList<>();
+
+    for (int i = 0; i < numberOfAddresses; i++)
+      this.data.add(0L);
   }
 
   public Long readItem(int address) { return data.get(address); }
@@ -19,6 +22,8 @@ public class MainMemory {
   }
 
   public void writeBlock(int blockNumber, List<Long> block) {
+    if (block.size() != addressesPerBlock)
+      throw new RuntimeException("invalid block length");
     writeListOfItems(firstAddress(blockNumber), block);
   }
 
