@@ -2,12 +2,7 @@
 
 ## Domínio da aplicação
 
-Objetos: Filmes, Sessões, Salas e Assentos.
-  
-### Filmes
-
-- Cada filme possui: id, titulo, descrição, duração e um conjunto de sessões disponíveis.
-  Uma sessão é formada por: uma sala, um horário e um dia da semana.
+Objetos: Salas e Assentos.
 
 ### Salas
 
@@ -23,20 +18,6 @@ Objetos: Filmes, Sessões, Salas e Assentos.
 ```mermaid
 classDiagram
   namespace Cinema {
-    class Filme {
-      - int id
-      - String título
-      - String descrição
-      - int duração
-      - List~Sessao~ sessões
-    }
-
-    class Sessao {
-      - Sala sala
-      - int horário
-      - int dia_da_semana
-    }
-    
     class Sala {
       - int id
       - int qnt_filas
@@ -57,8 +38,6 @@ classDiagram
   }
   
   Sala o-- Assento
-  Filme o-- Sessao
-  Sessao *-- Sala
 ```
 
 ## Abstrações de baixo nível
@@ -70,14 +49,12 @@ Objetos: Usuários, Processadores, Caches e RAM.
 Cada usuário do sistema é associado a um processador/cache.  
 O usuário pode realizar as seguintes ações:
 
-- Listar filmes e sessões*
 - Listar assentos de uma sala, incluindo o estado quanto a reserva
-- Selecionar um assento**
+- Selecionar um assento*
 - Cancelar uma seleção
 - Efetivar uma reserva
 
-*Os dados de uma sala são filtrados: exibe-se apenas o id.  
-**A seleção de um assento torna a sua reserva exclusiva a um usuário por tempo limitado.
+*A seleção de um assento torna a sua reserva exclusiva a um usuário por tempo limitado.
 Após um tempo de expiração, o assento volta a ser disponível.
 
 ### Processadores
