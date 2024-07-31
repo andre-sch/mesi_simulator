@@ -9,15 +9,31 @@ public record Room(
   long seatsPerRow,
   List<Seat> seats
 ) {
+  public Room(
+    long id,
+    long numberOfRows,
+    long seatsPerRow,
+    List<Seat> seats
+  ) {
+    this.id = id;
+    this.numberOfRows = numberOfRows;
+    this.seatsPerRow = seatsPerRow;
+    this.seats = seats;
+
+    if (seats.size() != numberOfRows * seatsPerRow)
+      throw new RuntimeException("seat quantity mismatch");
+  }
+
   public static Room deserialize(List<Long> serialization) {
+    var serializationCopy = new LinkedList<>(serialization);
     int firstItem = 0;
 
-    long id = serialization.remove(firstItem);
-    long numberOfRows = serialization.remove(firstItem);
-    long seatsPerRow = serialization.remove(firstItem);
+    long id = serializationCopy.remove(firstItem);
+    long numberOfRows = serializationCopy.remove(firstItem);
+    long seatsPerRow = serializationCopy.remove(firstItem);
     List<Seat> seats = new LinkedList<>();
 
-    for (long serializedSeat : serialization)
+    for (long serializedSeat : serializationCopy)
       seats.add(Seat.deserialize(serializedSeat));
 
     return new Room(id, numberOfRows, seatsPerRow, seats);
