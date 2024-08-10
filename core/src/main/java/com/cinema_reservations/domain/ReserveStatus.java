@@ -21,4 +21,9 @@ public enum ReserveStatus {
       default: throw new RuntimeException("invalid status");
     }
   }
+
+  public static ReserveStatus random() {
+    int randomCode = (int) Math.floor(Math.random() * 3);
+    return ReserveStatus.of(randomCode);
+  }
 }

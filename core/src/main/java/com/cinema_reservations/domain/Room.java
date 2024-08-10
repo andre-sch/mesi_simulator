@@ -31,4 +31,10 @@ public class Room {
   public long getNumberOfRows() { return numberOfRows; }
   public long getSeatsPerRow() { return seatsPerRow; }
   public List<Seat> getSeats() { return seats; }
+
+  public void randomize() {
+    this.seats = seats.stream()
+      .map((seat) -> Seat.random())
+      .toList();
+  }
 }

@@ -12,4 +12,9 @@ public record Seat(
   public Long serialize() {
     return (long) status.get();
   }
+
+  public static Seat random() {
+    var randomStatus = ReserveStatus.random();
+    return new Seat(randomStatus);
+  }
 }
