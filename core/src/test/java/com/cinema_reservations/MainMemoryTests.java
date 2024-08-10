@@ -21,16 +21,6 @@ public class MainMemoryTests {
   }
 
   @Test
-  public void writingDataset() {
-    var memory = new MainMemory(numberOfAddresses, addressesPerBlock);
-
-    int targetAddress = 20;
-    memory.writeListOfItems(targetAddress, dataset);
-
-    assertEquals(dataset, memory.readListOfItems(targetAddress, numberOfItems));
-  }
-
-  @Test
   public void writingBlock() {
     var memory = new MainMemory(numberOfAddresses, addressesPerBlock);
 

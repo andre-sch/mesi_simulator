@@ -18,27 +18,20 @@ public class MainMemory {
   public Long writeItem(int address, Long value) { return data.set(address, value); }
 
   public List<Long> readBlock(int blockNumber) {
-    return readListOfItems(firstAddress(blockNumber), addressesPerBlock);
+    List<Long> block = new LinkedList<>();
+
+    for (int i = 0; i < addressesPerBlock; i++)
+      block.add(readItem(firstAddress(blockNumber) + i));
+
+    return block;
   }
 
   public void writeBlock(int blockNumber, List<Long> block) {
-    if (block.size() != addressesPerBlock)
+    if (block.size() > addressesPerBlock)
       throw new RuntimeException("invalid block length");
-    writeListOfItems(firstAddress(blockNumber), block);
-  }
 
-  public List<Long> readListOfItems(int address, int amount) {
-    List<Long> items = new LinkedList<>();
-    
-    for (int i = 0; i < amount; i++)
-      items.add(readItem(address + i));
-    
-    return items;
-  }
-
-  public void writeListOfItems(int address, List<Long> items) {
-    for (int i = 0; i < items.size(); i++)
-      writeItem(address + i, items.get(i));
+    for (int i = 0; i < block.size(); i++)
+      writeItem(firstAddress(blockNumber) + i, block.get(i));
   }
 
   private int firstAddress(int blockNumber) { return blockNumber * addressesPerBlock; }
