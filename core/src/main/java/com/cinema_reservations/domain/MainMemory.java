@@ -4,15 +4,21 @@ import java.util.*;
 
 public class MainMemory {
   private final List<Long> data;
+  private final int numberOfBlocks;
   private final int addressesPerBlock;
 
-  public MainMemory(int numberOfAddresses, int addressesPerBlock) {
+  public MainMemory(int numberOfBlocks, int addressesPerBlock) {
+    this.numberOfBlocks = numberOfBlocks;
     this.addressesPerBlock = addressesPerBlock;
     this.data = new ArrayList<>();
 
-    for (int i = 0; i < numberOfAddresses; i++)
+    for (int i = 0; i < numberOfAddresses(); i++)
       this.data.add(0L);
   }
+
+  public int numberOfBlocks() { return numberOfBlocks; }
+  public int addressesPerBlock() { return addressesPerBlock; }
+  public int numberOfAddresses() { return numberOfBlocks * addressesPerBlock; }
 
   public Long readItem(int address) { return data.get(address); }
   public Long writeItem(int address, Long value) { return data.set(address, value); }

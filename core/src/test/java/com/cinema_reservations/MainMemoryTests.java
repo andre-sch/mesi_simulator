@@ -12,7 +12,7 @@ public class MainMemoryTests {
   final List<Long> dataset = new LinkedList<>();
   final int numberOfItems = 15;
 
-  final int numberOfAddresses = 50;
+  final int numberOfBlocks = 5;
   final int addressesPerBlock = 10;
 
   public MainMemoryTests() {
@@ -22,7 +22,7 @@ public class MainMemoryTests {
 
   @Test
   public void writingBlock() {
-    var memory = new MainMemory(numberOfAddresses, addressesPerBlock);
+    var memory = new MainMemory(numberOfBlocks, addressesPerBlock);
 
     int blockNumber = 2;
     memory.writeBlock(blockNumber, block);
@@ -32,7 +32,7 @@ public class MainMemoryTests {
 
   @Test
   public void writingBlockWithInvalidLength() {
-    var memory = new MainMemory(numberOfAddresses, addressesPerBlock);
+    var memory = new MainMemory(numberOfBlocks, addressesPerBlock);
 
     assertThrows(RuntimeException.class, () -> {
       int blockNumber = 2;
