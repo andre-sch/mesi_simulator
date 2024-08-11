@@ -1,30 +1,28 @@
 package com.cinema_reservations.domain;
 
-import java.util.*;
 import com.cinema_reservations.domain.events.*;
 import com.cinema_reservations.domain.dispatchers.*;
 
 public class Bus {
-  private final List<Cache> caches = new LinkedList<>();
+  private final int numberOfBlocks = 10;
+  private final int addressesPerBlock = 5;
+  private final int numberOfLines = 5;
+  
+  private final MainMemory mainMemory = new MainMemory(numberOfBlocks, addressesPerBlock);
+
   private final Dispatcher<CacheEvent> eventDispatcher = new Dispatcher<>();
   private final BidirectionalDispatcher<ReadMiss, DataLookup> bidirectionalEventDispatcher = new ReadMissDispatcher();
 
-  public Bus(
-    MainMemory memory,
-    int numberOfCaches,
-    int numberOfCacheLines
-  ) {
-    for (int i = 0; i < numberOfCaches; i++) {
-      var cache = new Cache(
-        memory,
-        numberOfCacheLines,
-        eventDispatcher,
-        bidirectionalEventDispatcher
-      );
+  public int numberOfBlocks() { return numberOfBlocks; }
+  public int addressesPerBlock() { return addressesPerBlock; }
+  public int numberOfLines() { return numberOfLines; }
 
-      eventDispatcher.addObserver(cache.getHandler());
-      bidirectionalEventDispatcher.addObserver(cache.getBidirectionalHandler());
-      this.caches.add(cache);
-    }
+  public Cache appendCache() {
+    return new Cache(
+      mainMemory,
+      numberOfLines,
+      eventDispatcher,
+      bidirectionalEventDispatcher
+    );
   }
 }

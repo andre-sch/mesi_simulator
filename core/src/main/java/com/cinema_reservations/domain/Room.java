@@ -11,7 +11,6 @@ public class Room {
   private long seatsPerRow;
   private List<Seat> seats;
 
-  public Room(long id) { this(id, 3, 9); }
   public Room(long id, long numberOfRows, long seatsPerRow) {
     this.id = id;
     this.numberOfRows = numberOfRows;
