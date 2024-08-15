@@ -21,7 +21,10 @@ public class RoomDeserializer {
     List<Seat> seats = new LinkedList<>();
     var contentIterator = blockListContent.listIterator();
 
-    while (contentIterator.nextIndex() < numberOfSeats) {
+    while (
+      contentIterator.hasNext() &&
+      contentIterator.nextIndex() < numberOfSeats
+    ) {
       long serializedSeat = contentIterator.next();
       seats.add(Seat.deserialize(serializedSeat));
     }
