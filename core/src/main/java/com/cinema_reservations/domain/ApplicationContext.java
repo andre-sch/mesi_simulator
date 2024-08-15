@@ -23,14 +23,16 @@ public class ApplicationContext {
   public int blockNumberOf(int roomId) { return blockNumberByRoom.get(roomId); }
 
   public int blocksPerRoom() {
-    var sampleRoom = new Room(0, numberOfRows, seatsPerRow);
-    int numberOfRoomAddresses = roomSerializer.serialize(sampleRoom).size();
-    return numberOfRoomAddresses / memory.addressesPerBlock();
+    return blocksPerAddresses(numberOfRows * seatsPerRow) + 1; // header
   }
 
   public int blocksPerHeader() {
-    final int numberOfHeaderAddresses = 3; // roomId, numberOfRows, seatsPerRow
-    return numberOfHeaderAddresses / memory.addressesPerBlock();
+    return blocksPerAddresses(3); // roomId, numberOfRows, seatsPerRow
+  }
+
+  private int blocksPerAddresses(int addresses) {
+    final double result = (double) addresses / memory.addressesPerBlock();
+    return (int) Math.ceil(result);
   }
 
   public void setupMemory() {
