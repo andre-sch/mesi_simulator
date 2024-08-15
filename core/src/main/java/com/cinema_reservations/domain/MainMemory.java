@@ -16,6 +16,8 @@ public class MainMemory {
       this.data.add(0L);
   }
 
+  public List<Long> getContent() { return data; }
+
   public int numberOfBlocks() { return numberOfBlocks; }
   public int addressesPerBlock() { return addressesPerBlock; }
   public int numberOfAddresses() { return numberOfBlocks * addressesPerBlock; }

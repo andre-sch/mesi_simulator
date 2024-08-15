@@ -25,4 +25,8 @@ public class Bus {
       bidirectionalEventDispatcher
     );
   }
+
+  public MainMemory getSharedMemory() {
+    return mainMemory;
+  }
 }

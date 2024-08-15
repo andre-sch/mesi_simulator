@@ -9,8 +9,6 @@ public class Processor {
   private Cache cache;
   private Bus bus;
 
-  // todo: manipulate IO client interface (GUI) in Processor
-
   public Processor(
     ApplicationContext context,
     Bus bus
@@ -20,6 +18,10 @@ public class Processor {
     this.bus = bus;
   }
   
+  public List<Line> getCacheContent() {
+    return cache.getContent();
+  }
+
   public Room selectRoom(int roomId) {
     int firstBlockNumber = context.blockNumberOf(roomId);
     int lastBlockNumber = firstBlockNumber + context.blocksPerRoom() - 1;
@@ -30,12 +32,7 @@ public class Processor {
       serialization.add(block);
     }
 
-    // todo: instead of returning, render the selected room
     return roomDeserializer.deserialize(serialization);
-  }
-
-  public void cancelRoomSelection() {
-    // todo: just clear room rendering, do not clear cache
   }
 
   public void reserveSeat(int roomId, int row, int seatNumber) {
