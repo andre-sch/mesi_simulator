@@ -4,9 +4,9 @@ import com.cinema_reservations.domain.events.*;
 import com.cinema_reservations.domain.dispatchers.*;
 
 public class Bus {
-  private final int numberOfBlocks = 10;
-  private final int addressesPerBlock = 5;
-  private final int numberOfLines = 5;
+  private final int numberOfBlocks = 12;
+  private final int addressesPerBlock = 6;
+  private final int numberOfLines = 6;
   
   private final MainMemory mainMemory = new MainMemory(numberOfBlocks, addressesPerBlock);
 
