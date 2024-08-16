@@ -1,1 +1,10 @@
-target/
+# editor
+.vscode
+.idea
+
+# source
+dist
+target
+
+# deps
+node_modules
