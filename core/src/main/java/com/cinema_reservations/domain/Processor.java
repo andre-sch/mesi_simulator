@@ -35,22 +35,22 @@ public class Processor {
     return roomDeserializer.deserialize(serialization);
   }
 
-  public void reserveSeat(int roomId, int row, int seatNumber) {
+  public void reserveSeat(int roomId, int seatNumber) {
     int blockNumber = context.blockNumberOf(roomId);
     blockNumber += context.blocksPerHeader();
-  
-    int seatAddress = row * context.seatsPerRow() + seatNumber;
-    blockNumber += seatAddress / bus.addressesPerBlock();
+
+    blockNumber += seatNumber / bus.addressesPerBlock();
+    int blockSeatIndex = seatNumber % bus.addressesPerBlock();
 
     List<Long> block = cache.readBlock(blockNumber);
-    long serializedSeat = block.get(seatNumber);
+    long serializedSeat = block.get(blockSeatIndex);
     var seat = Seat.deserialize(serializedSeat);
 
     if (seat.status() == ReserveStatus.RESERVED)
       throw new RuntimeException("the seat is already reserved");
 
     var reservedSeat = new Seat(ReserveStatus.RESERVED);
-    block.set(seatNumber, reservedSeat.serialize());
+    block.set(blockSeatIndex, reservedSeat.serialize());
 
     cache.writeBlock(blockNumber, block);
   }
