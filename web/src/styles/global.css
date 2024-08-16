@@ -1,0 +1,8 @@
+*, button, input {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-sizing: border-box;
+  font-family: Verdana, Tahoma, sans-serif;
+}
