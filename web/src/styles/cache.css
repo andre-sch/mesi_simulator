@@ -1,0 +1,5 @@
+.wrapper:has(.cache) {
+  width: 25rem;
+}
+
+.cache th:not(:last-child) { width: 0%; }
