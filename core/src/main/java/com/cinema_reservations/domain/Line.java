@@ -20,8 +20,7 @@ public class Line {
   }
 
   public void setContent(List<Long> newContent) {
-    content.clear();
-    content.addAll(newContent);
+    content = newContent;
   }
 }
 
