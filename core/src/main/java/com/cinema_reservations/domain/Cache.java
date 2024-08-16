@@ -26,7 +26,13 @@ public class Cache {
   }
 
   public List<Line> getContent() {
-    return new ArrayList<>(data);
+    List<Line> dataCopy = new LinkedList<>(data);
+    int blockNumber = 0;
+
+    while (dataCopy.size() < maxLines)
+      dataCopy.add(new Line(blockNumber, memory.addressesPerBlock()));
+
+    return dataCopy;
   }
 
   public void writeBlock(int blockNumber, List<Long> newContent) {
@@ -91,7 +97,7 @@ public class Cache {
     var block = line.getContent();
     var blockNumber = line.getBlockNumber();
 
-    memory.writeBlock(blockNumber, block);
+    memory.writeBlock(blockNumber, block); // escreve mesmo se estiver invalido?
   }
 
   public Consumer<CacheEvent> getHandler() {

@@ -1,10 +1,14 @@
 package com.cinema_reservations.domain;
 
-import java.util.List;
+import java.util.*;
 
 public class Line {
   private Tag tag;
   private List<Long> content;
+
+  public Line(int blockNumber, int numberOfAddresses) {
+    this(blockNumber, Collections.nCopies(numberOfAddresses, 0L));
+  }
 
   public Line(int blockNumber, List<Long> content) {
     this.tag = new Tag(blockNumber);
