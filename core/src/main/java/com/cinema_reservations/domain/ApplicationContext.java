@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 public class ApplicationContext {
   private final int numberOfRooms = 2;
-  private final int numberOfRows = 9;
-  private final int seatsPerRow = 3;
+  private final int numberOfRows = 3;
+  private final int seatsPerRow = 9;
 
   private final MainMemory memory;
   private final RoomSerializer roomSerializer;
