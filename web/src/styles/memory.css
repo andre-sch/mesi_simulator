@@ -1,0 +1,9 @@
+.wrapper:has(.main-memory) {
+  width: 20rem;
+  height: 20rem;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.main-memory th:first-child { width: 0%; }
+.main-memory th:not(:first-child) { width: 50%; }
