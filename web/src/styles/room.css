@@ -1,0 +1,14 @@
+.output {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.seat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  border: 1px solid #bbb;
+}
+
+.seat.reserved { background: #ddd; }
