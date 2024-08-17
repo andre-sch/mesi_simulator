@@ -1,14 +1,20 @@
 package com.cinema_reservations.application;
 
 import com.cinema_reservations.domain.Room;
+import com.cinema_reservations.domain.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class RoomListingController {
   private ProcessingProvider processingProvider;
+  private ApplicationContext context;
 
-  public RoomListingController(ProcessingProvider processingProvider) {
+  public RoomListingController(
+    ProcessingProvider processingProvider,
+    ApplicationContext context
+  ) {
     this.processingProvider = processingProvider;
+    this.context = context;
   }
 
   @PutMapping("/rooms/{roomId}")
@@ -17,5 +23,11 @@ public class RoomListingController {
     return processor.selectRoom(roomId);
   }
 
+  @GetMapping("/rooms/count")
+  public RoomCount count() {
+    return new RoomCount(context.numberOfRooms());
+  }
+
   private static record Request(int processorId) {}
+  private static record RoomCount(int count) {}
 }

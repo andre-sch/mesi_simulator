@@ -1,7 +1,7 @@
 import axios from "axios";
 import { MemoryRenderer } from "./memory";
 import { CacheRenderer, Line } from "./cache";
-import { Room, RoomRenderer } from "./room";
+import { Room, OutputRenderer } from "./output";
 
 var api = axios.create({
   baseURL: "http://localhost:8080"
@@ -24,12 +24,21 @@ async function createProcessor(): Promise<number> {
   return response.data.id;
 }
 
-async function selectRoom(roomId: number, processorId: number): Promise<void> {
+async function renderOutput(processorId: number, newContent?: Room) {
+  var response = await api.get<{ count: number }>(`/rooms/count`);
+  var outputRenderer = new OutputRenderer(processorId, response.data.count);
+  outputRenderer.render(newContent);
+}
+
+async function selectRoom(roomId: number, processorId: number): Promise<Room> {
   var response = await api.put<Room>(`/rooms/${roomId}`, { processorId });
-  var roomRenderer = new RoomRenderer(processorId);
-  roomRenderer.render(response.data);
-  renderCache(processorId);
+  var room = response.data;
+
   renderMemory();
+  renderCache(processorId);
+  renderOutput(processorId, room);
+
+  return room;
 }
 
 async function reserveSeat(roomId: number, seatId: number, processorId: number): Promise<void> {
@@ -45,4 +54,11 @@ async function getMemoryContent(): Promise<number[]> {
   return (await api.get<number[]>("/shared-memory")).data;
 }
 
-export { renderMemory, renderCache, createProcessor, selectRoom, reserveSeat };
+export {
+  renderMemory,
+  renderCache,
+  createProcessor,
+  renderOutput,
+  selectRoom,
+  reserveSeat
+};

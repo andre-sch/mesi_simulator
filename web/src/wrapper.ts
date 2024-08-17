@@ -1,8 +1,8 @@
-function wrapperOf(node: Element): Element {
+function wrapperOf(...nodeList: Element[]): Element {
   var wrapper = document.createElement("div");
-
+  
   wrapper.classList.add("wrapper");
-  wrapper.appendChild(node);
+  nodeList.forEach(node => wrapper.appendChild(node));
 
   return wrapper;
 }

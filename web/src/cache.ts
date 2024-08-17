@@ -8,13 +8,13 @@ export interface Line {
 
 export class CacheRenderer {
   private container = document.querySelector(".app") as Element;
-  private id: string;
+  private className: string;
 
   constructor(id: number) {
-    this.id = `computer-${id}`;
+    this.className = `processor-${id}`;
   }
 
-  private cacheQuery(): string { return `.cache.${this.id}`; }
+  private cacheQuery(): string { return `.cache.${this.className}`; }
 
   public render(data: Line[]) {
     var alreadyExists = document.querySelector(this.cacheQuery()) != null;
@@ -43,7 +43,7 @@ export class CacheRenderer {
 
   private cache(): Element {
     var cache = document.createElement("table");
-    cache.classList.add("cache", this.id.toString());
+    cache.classList.add("cache", this.className);
     return cache;
   }
 

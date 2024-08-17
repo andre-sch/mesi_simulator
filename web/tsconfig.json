@@ -17,6 +17,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "strictPropertyInitialization": false,
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"]

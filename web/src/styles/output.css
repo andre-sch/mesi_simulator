@@ -1,0 +1,40 @@
+.output {
+  display: flex;
+  flex-direction: column;
+  width: 28.625rem;
+  height: 19.125rem;
+  padding: 2rem;
+}
+
+.output h1 { font-size: 1.25rem; }
+
+.room-options, .select-room { width: 100%; }
+
+.room-options { margin-top: 2rem; }
+
+.select-room {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+}
+
+.select-room + .select-room { margin-top: 0.5rem; }
+
+.reserve { padding: 0.5rem 1rem; }
+
+.room {
+  display: grid;
+  gap: 0.25rem;
+  margin: 2rem 0 1.5rem;
+}
+
+.seat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  border: 1px solid #bbb;
+  cursor: pointer;
+}
+
+.seat.reserved { background: #ddd; cursor: default; }
+.seat.selected { border: 2px solid #000; }

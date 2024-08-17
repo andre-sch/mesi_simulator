@@ -5,4 +5,24 @@
   background: transparent;
   box-sizing: border-box;
   font-family: Verdana, Tahoma, sans-serif;
+  font-size: 100%;
+}
+
+button, a { cursor: pointer; }
+
+a { text-decoration: underline; }
+
+button {
+  background: #eee;
+  border: 1px solid #bbb;
+  border-radius: 0.25rem;
+}
+
+button:hover {
+  background: #ddd;
+  transition: background 0.2s;
+}
+
+.wrapper {
+  border: 2px solid #bbb;
 }
