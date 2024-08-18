@@ -6,7 +6,10 @@
   padding: 2rem;
 }
 
-.output h1 { font-size: 1.25rem; }
+.output h1 {
+  font-size: 1.25rem;
+  font-weight: 400;
+}
 
 .room-options, .select-room { width: 100%; }
 

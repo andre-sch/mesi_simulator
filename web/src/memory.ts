@@ -19,20 +19,16 @@ export class MemoryRenderer {
   }
 
   private initialize(data: number[]) {
-    var mainMemory = this.memory();
-    mainMemory.appendChild(this.header());
+    var table = document.createElement("table");
+    table.appendChild(this.header());
   
     data.forEach((value, address) => {
-      mainMemory.appendChild(this.row(value, address));
+      table.appendChild(this.row(value, address));
     })
 
-    this.container.appendChild(wrapperOf(mainMemory));
-  }
-
-  private memory(): Element {
-    var mainMemory = document.createElement("table");
-    mainMemory.classList.add("main-memory");
-    return mainMemory;
+    var wrapper = wrapperOf(table);
+    wrapper.classList.add("main-memory");
+    this.container.appendChild(wrapper);
   }
 
   private header(): Element {

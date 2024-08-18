@@ -8,13 +8,13 @@ export interface Line {
 
 export class CacheRenderer {
   private container = document.querySelector(".app") as Element;
-  private className: string;
+  private processorName: string;
 
   constructor(id: number) {
-    this.className = `processor-${id}`;
+    this.processorName = `processor-${id}`;
   }
 
-  private cacheQuery(): string { return `.cache.${this.className}`; }
+  private cacheQuery(): string { return `.cache.${this.processorName}`; }
 
   public render(data: Line[]) {
     var alreadyExists = document.querySelector(this.cacheQuery()) != null;
@@ -31,20 +31,16 @@ export class CacheRenderer {
   }
 
   private initialize(data: Line[]) {
-    var cache = this.cache();
-    cache.appendChild(this.header());
+    var table = document.createElement("table");
+    table.appendChild(this.header());
   
     data.forEach((line, index) => {
-      cache.appendChild(this.row(line, index));
+      table.appendChild(this.row(line, index));
     })
 
-    this.container.appendChild(wrapperOf(cache));
-  }
-
-  private cache(): Element {
-    var cache = document.createElement("table");
-    cache.classList.add("cache", this.className);
-    return cache;
+    var wrapper = wrapperOf(table);
+    wrapper.classList.add("cache", this.processorName);
+    this.container.appendChild(wrapper);
   }
 
   private header(): Element {

@@ -1,6 +1,5 @@
-.wrapper:has(.main-memory) {
+.main-memory {
   width: 20rem;
-  height: 20rem;
   overflow: scroll;
   overflow-x: hidden;
 }
