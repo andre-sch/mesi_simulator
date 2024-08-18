@@ -7,6 +7,8 @@ var api = axios.create({
   baseURL: "http://localhost:8080"
 });
 
+var numberOfProcessors = 3;
+
 async function renderMemory(): Promise<void> {
   var memoryRenderer = new MemoryRenderer();
   var content = await getMemoryContent();
@@ -55,6 +57,7 @@ async function getMemoryContent(): Promise<number[]> {
 }
 
 export {
+  numberOfProcessors,
   renderMemory,
   renderCache,
   createProcessor,

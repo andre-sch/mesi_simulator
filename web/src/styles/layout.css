@@ -2,20 +2,8 @@
   display: grid;
   justify-content: center;
   align-items: flex-start;
-  grid-template-areas:
-    "output-0 cache-0 memory"
-    "output-1 cache-1 memory"
-    "output-2 cache-2 memory";
   gap: 1rem 2rem;
   height: 100vh;
 }
 
 .main-memory { grid-area: memory; height: 100%; }
-
-.output.processor-0 { grid-area: output-0; }
-.output.processor-1 { grid-area: output-1; }
-.output.processor-2 { grid-area: output-2; }
-
-.cache.processor-0 { grid-area: cache-0; }
-.cache.processor-1 { grid-area: cache-1; }
-.cache.processor-2 { grid-area: cache-2; }

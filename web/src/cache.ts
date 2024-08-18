@@ -10,8 +10,8 @@ export class CacheRenderer {
   private container = document.querySelector(".app") as Element;
   private processorName: string;
 
-  constructor(id: number) {
-    this.processorName = `processor-${id}`;
+  constructor(private processorId: number) {
+    this.processorName = `processor-${processorId}`;
   }
 
   private cacheQuery(): string { return `.cache.${this.processorName}`; }
@@ -40,6 +40,7 @@ export class CacheRenderer {
 
     var wrapper = wrapperOf(table);
     wrapper.classList.add("cache", this.processorName);
+    wrapper.style.gridArea = `cache-${this.processorId}`;
     this.container.appendChild(wrapper);
   }
 

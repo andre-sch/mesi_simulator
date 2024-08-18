@@ -1,12 +1,22 @@
-import * as api from "./api";
+import {
+  createProcessor,
+  numberOfProcessors,
+  renderCache,
+  renderMemory,
+  renderOutput
+} from "./api";
 
 window.addEventListener("load", async () => {
-  api.renderMemory();
+  renderMemory();
 
-  var numberOfProcessors = 3;
+  var layout = "";
   for (var i = 0; i < numberOfProcessors; i++) {
-    var processorId = await api.createProcessor();
-    api.renderCache(processorId);
-    api.renderOutput(processorId);
+    var processorId = await createProcessor();
+    renderCache(processorId);
+    renderOutput(processorId);
+    layout += `"output-${processorId} cache-${processorId} memory"\n`
   }
+
+  var app = document.querySelector(".app") as HTMLDivElement;
+  app.style.gridTemplateAreas = layout;
 })

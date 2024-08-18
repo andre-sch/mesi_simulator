@@ -1,4 +1,4 @@
-function wrapperOf(...nodeList: Element[]): Element {
+function wrapperOf(...nodeList: Element[]): HTMLDivElement {
   var wrapper = document.createElement("div");
   
   wrapper.classList.add("wrapper");
