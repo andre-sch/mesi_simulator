@@ -18,13 +18,9 @@ public class ProcessingProvider {
     this.bus = bus;
   }
 
-  public int appendProcessor() {
-    int id = processors.size();
-    processors.add(new Processor(context, bus));
-    return id;
-  }
-
   public Processor getProcessor(int id) {
+    while (id >= processors.size())
+      processors.add(new Processor(context, bus));
     return processors.get(id);
   }
 }

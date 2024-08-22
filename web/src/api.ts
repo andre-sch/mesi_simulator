@@ -8,8 +8,6 @@ var api = axios.create({
 });
 
 var numberOfProcessors = 3;
-var renderedCaches = new Map<number, number>();
-
 var response = await api.get<{ count: number }>(`/rooms/count`);
 var roomCount = response.data.count;
 
@@ -23,11 +21,6 @@ async function renderCache(id: number): Promise<void> {
   var cacheRenderer = new CacheRenderer(id);
   var content = await getCacheContent(id);
   cacheRenderer.render(content);
-}
-
-async function createProcessor(): Promise<number> {
-  var response = await api.post<{ id: number }>("/processors");
-  return response.data.id;
 }
 
 async function renderOutput(processorId: number, newContent?: Room) {
@@ -51,17 +44,13 @@ async function reserveSeat(roomId: number, seatId: number, processorId: number):
 
 function renderRoomUpdate(room: Room, processorId: number): void {
   renderMemory();
-
-  renderedCaches.set(processorId, room.id);
-  renderCachesRelatedToRoom(room.id);
-
+  renderCaches();
   renderOutput(processorId, room);
 }
 
-function renderCachesRelatedToRoom(roomId: number) {
-  renderedCaches.forEach((renderedRoomId, renderedProcessorId) => {
-    if (renderedRoomId == roomId) renderCache(renderedProcessorId);
-  });
+function renderCaches() {
+  for (var processorId = 0; processorId < numberOfProcessors; processorId++)
+    renderCache(processorId);
 }
 
 async function getCacheContent(id: number): Promise<Line[]> {
@@ -78,7 +67,6 @@ export {
   numberOfProcessors,
   renderMemory,
   renderCache,
-  createProcessor,
   renderOutput,
   selectRoom,
   reserveSeat

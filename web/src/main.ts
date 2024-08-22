@@ -1,5 +1,4 @@
 import {
-  createProcessor,
   numberOfProcessors,
   renderCache,
   renderMemory,
@@ -10,8 +9,7 @@ window.addEventListener("load", async () => {
   renderMemory();
 
   var layout = "";
-  for (var i = 0; i < numberOfProcessors; i++) {
-    var processorId = await createProcessor();
+  for (var processorId = 0; processorId < numberOfProcessors; processorId++) {
     renderCache(processorId);
     renderOutput(processorId);
     layout += `"output-${processorId} cache-${processorId} memory"\n`
