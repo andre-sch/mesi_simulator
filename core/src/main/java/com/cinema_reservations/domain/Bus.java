@@ -34,6 +34,8 @@ public class Bus {
       bidirectionalEventDispatcher
     );
 
+    int cacheIndex = caches.size();
+    eventDispatcher.addObserver(new CacheEventLogger(cacheIndex));
     addCacheToRegisteredDispatchers(cache);
     addRegisteredCachesToEventDispatchers(
       eventDispatcher,
