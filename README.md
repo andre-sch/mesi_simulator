@@ -1,87 +1,66 @@
-# Reservas de cinema
+# MESI Simulator
 
-## Domínio da aplicação
+Caches otimizam o acesso a memória principal por processadores. Armazenando informações
+temporariamente, de modo a reduzir o uso do barramento de interconexão.
 
-Objetos: Salas e Assentos.
+Em arquiteturas com multiprocessadores, a inconsistência entre caches torna-se
+um problema comum. Para lidar com isso, diversas alternativas foram criadas.
+Uma delas é o protocolo MESI — simulado pelo projeto.
 
-### Salas
+Segundo o protocolo MESI, cada linha da cache possui um dos estados: Modificado,
+Exclusivo, Compartilhado ou Invalido. Com base nesses dados é possível assegurar
+a validade e a exclusividade da cópia de uma informação.
 
-- Cada um possui uma identificação numérica { 1, 2, 3, ... } e um conjunto de
-  assentos, simplificadamente distribuídos em uma matriz com m linhas (qnt_filas)
-  e n colunas (qnt_assentos_por_fila).
+## Questões de projeto
 
-### Assentos
+### Aplicação
 
-- Uma posição na matriz de uma sala.
-- Possui um conjunto de estados quanto a reserva { Disponível, Reservado }.
-
-```mermaid
-classDiagram
-  namespace Cinema {
-    class Sala {
-      - int id
-      - int qnt_filas
-      - int qnt_assentos_por_fila
-      - List~Assento~ assentos
-    }
-    
-    class Assento {
-      - Estado_Reserva estado
-    }
-    
-    class Estado_Reserva {
-      <<enumeration>>
-      Disponível
-      Reservado
-    }
-  }
-  
-  Sala o-- Assento
-```
-
-## Abstrações de baixo nível
-
-Objetos: Usuários, Processadores, Caches e RAM.
-
-### Usuários
-
-Cada usuário do sistema é associado a um processador/cache.  
-O usuário pode realizar as seguintes ações:
-
-- Listar assentos de uma sala, incluindo o estado quanto a reserva
-- Efetivar uma reserva
+O contexto do projeto abrange um sistema de reservas de cinema. De uma forma simplificada,
+um cinema é composto por salas e assentos. Cada sala é uma matriz de assentos,
+e cada assento é associado a um estado: disponível ou reservado.
 
 ### Processadores
 
-As ações do usuário devem ser gerenciadas por processadores, que se comunicam com
-a memória/cache para conseguir as informações necessárias.
+Gerenciam as ações do usuário, comunicando-se com a cache para obter as informações necessárias.  
+Contém as operações:
+
+- Listagem de salas
+- Reserva de assentos
 
 ### Caches
 
-Uma cache deve armazenar uma porção da memória principal (RAM).  
-Questões a serem consideradas:
+Uma cache deve armazenar uma parte da memória principal. Ela contém um conjunto de linhas,
+em que cada linha é composto por uma tag e a cópia de um bloco da memória.
+A tag, por sua vez, guarda o mapeamento do bloco e o estado do protocolo.
 
-- Função de mapeamento: aleatória — qualquer bloco da memória pode ser salvo em qualquer linha
-- Algoritmo de substituição: FIFO/Queue — o primeiro bloco a ser mapeado é removido
-- Gerenciamento de Tags: guardam o mapeamento linha/bloco + status de uso (protocolo MESI)
-- Canal de comunicação entre caches
+### Memória principal
 
-### RAM
+Contém um conjunto de blocos, em que cada bloco é uma coleção de dados serializados
+como números decimais.
 
-Questões de projeto:
+## Implementação
 
-- Quantidade de endereços
-- Tamanho e tipagem da palavra
-- Serialização e deserialização de objetos do domínio
+O projeto segue uma arquitetura cliente-servidor. Com um servidor `/api` desenvolvido
+com Java e Spring, além de um cliente web `/web`, desenvolvido com Typescript, HTML e CSS.
 
-```mermaid
----
-title: Relacionamentos
----
-stateDiagram
-  direction LR
+### Requisitos
 
-  Usuário --> Processador : 1/1
-  Processador --> Cache : 1/1
-  Cache --> RAM : */1
+- Java Development Kit 17
+- Apache Maven
+- Node Package Manager
+
+### Configuração do servidor
+
+```sh
+cd api/
+mvn package
+java -jar target/api-1.0.0.jar
+```
+
+### Configuração do cliente
+
+```sh
+cd web/
+npm install
+npm run dev
 ```
