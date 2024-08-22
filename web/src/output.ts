@@ -34,7 +34,6 @@ export class OutputRenderer {
   private initialize(): void {
     var output = wrapperOf(...this.mainPage());
     output.classList.add("output", this.processorName);
-    output.style.gridArea = `output-${this.processorId}`;
     this.container.appendChild(output);
   }
 
