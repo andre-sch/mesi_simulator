@@ -22,6 +22,7 @@
 
 .select-room + .select-room { margin-top: 0.5rem; }
 
+.go-back { width: min-content; }
 .reserve { padding: 0.5rem 1rem; }
 
 .room {
