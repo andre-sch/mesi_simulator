@@ -6,7 +6,8 @@ import com.cinema_reservations.domain.events.*;
 import com.cinema_reservations.domain.dispatchers.*;
 
 public class Cache {
-  private final Queue<Line> data = new LinkedList<>();
+  private final Map<Integer, Line> data = new LinkedHashMap<>();
+  private final Queue<Integer> insertions = new LinkedList<>();
   private final MainMemory memory;
   private final int maxLines;
 
@@ -26,7 +27,7 @@ public class Cache {
   }
 
   public List<Line> getContent() {
-    List<Line> dataCopy = new LinkedList<>(data);
+    List<Line> dataCopy = new LinkedList<>(data.values());
     int blockNumber = 0;
 
     while (dataCopy.size() < maxLines)
@@ -43,94 +44,118 @@ public class Cache {
   }
 
   public void writeBlock(int blockNumber, List<Long> newContent) {
-    Line line;
-    Optional<Line> internalCacheLookup = readFromCache(blockNumber);
-
-    if (internalCacheLookup.isPresent()) {
-      line = internalCacheLookup.get();
-      eventDispatcher.dispatch(new WriteHit(blockNumber));
-    } else {
-      line = loadBlockInCache(blockNumber);
-      eventDispatcher.dispatch(new WriteMiss(blockNumber));
-    }
-
+    var line = fetch(blockNumber);
+    CacheEvent event;
+    
+    if (line.getStatus() != ProtocolStatus.INVALID)
+      event = new WriteHit(blockNumber);
+    else event = new WriteMiss(blockNumber);
+    
+    eventDispatcher.dispatch(event);
     line.setStatus(ProtocolStatus.MODIFIED);
     line.setContent(newContent);
   }
 
   public List<Long> readBlock(int blockNumber) {
-    var internalCacheLookup = readFromCache(blockNumber);
-    if (internalCacheLookup.isPresent()) {
+    var prefetch = fetchRetained(blockNumber);
+    Line line;
+
+    if (prefetch.isPresent()) {
+      line = prefetch.get();
       eventDispatcher.dispatch(new ReadHit(blockNumber));
-      var line = internalCacheLookup.get();
-      return line.getContent();
+    } else {
+      var event = new ReadMiss(blockNumber);
+
+      eventDispatcher.dispatch(event);
+      var externalCacheLookup = bidirectionalEventDispatcher.dispatch(event);
+      var statusUpdate = externalCacheLookup.isPresent() && externalCacheLookup.get().isSuccessful()
+        ? ProtocolStatus.SHARED : ProtocolStatus.EXCLUSIVE;
+      
+      line = fetch(blockNumber);
+      line.setStatus(statusUpdate);
     }
-
-    var event = new ReadMiss(blockNumber);
-
-    eventDispatcher.dispatch(event);
-    var externalCacheLookup = bidirectionalEventDispatcher.dispatch(event);
-    var status = externalCacheLookup.isPresent() && externalCacheLookup.get().isSuccessful()
-      ? ProtocolStatus.SHARED : ProtocolStatus.EXCLUSIVE;
-
-    var line = loadBlockInCache(blockNumber);
-    line.setStatus(status);
 
     return line.getContent();
   }
 
-  private Optional<Line> readFromCache(int blockNumber) {
-    for (var line : data) {
-      boolean isPresent = line.getBlockNumber() == blockNumber;
-      if (isPresent) return Optional.of(line);
-    }
+  private Line fetch(int blockNumber) {
+    for (var entry : data.entrySet()) {
+      int cacheIndex = entry.getKey();
+      var cacheLine = entry.getValue();
 
-    return Optional.empty();
+      if (cacheLine.getBlockNumber() == blockNumber) {
+        if (cacheLine.getStatus() == ProtocolStatus.INVALID)
+          cacheLine = loadFromMemory(blockNumber, cacheIndex);
+  
+        return cacheLine;
+      }
+    }
+    return loadFromMemory(blockNumber);
   }
 
-  private Line loadBlockInCache(int blockNumber) {
-    if (data.size() == maxLines) releaseLine();
-    
+  private Line loadFromMemory(int blockNumber) {
+    int nextInsertedIndex;
+    boolean isCacheFull = data.size() == maxLines;
+  
+    if (isCacheFull) {
+      int firstInsertedIndex = insertions.poll();
+      Line firstInserted = data.get(firstInsertedIndex);
+
+      if (firstInserted.getStatus() == ProtocolStatus.MODIFIED)
+        memory.writeBlock(firstInserted.getBlockNumber(), firstInserted.getContent());
+
+      nextInsertedIndex = firstInsertedIndex;
+    } else nextInsertedIndex = insertions.size();
+
+    return loadFromMemory(blockNumber, nextInsertedIndex);
+  }
+
+  private Line loadFromMemory(int blockNumber, int cacheIndex) {
     var content = memory.readBlock(blockNumber);
     var line = new Line(blockNumber, content);
+    data.put(cacheIndex, line);
+
+    if (!insertions.contains(cacheIndex))
+      insertions.add(cacheIndex);
     
-    data.offer(line);
     return line;
-  }
-  
-  private void releaseLine() {
-    var line = data.poll();
-
-    var block = line.getContent();
-    var blockNumber = line.getBlockNumber();
-
-    memory.writeBlock(blockNumber, block); // escreve mesmo se estiver invalido?
   }
 
   public Consumer<CacheEvent> getHandler() {
     return (CacheEvent event) -> {
-      var internalCacheLookup = readFromCache(event.blockNumber());
+      var internalCacheLookup = fetchRetained(event.blockNumber());
       if (internalCacheLookup.isEmpty()) return;
       
       var line = internalCacheLookup.get();
 
-      if (event.operation() == OperationType.WRITE)
-        line.setStatus(ProtocolStatus.INVALID);
-      
-      if (event.operation() == OperationType.READ) {
-        if (line.getStatus() == ProtocolStatus.MODIFIED)
-          memory.writeBlock(line.getBlockNumber(), line.getContent());
+      if (line.getStatus() == ProtocolStatus.MODIFIED)
+        memory.writeBlock(line.getBlockNumber(), line.getContent());
+
+      if (event.operation() == OperationType.READ)
         line.setStatus(ProtocolStatus.SHARED);
-      }
+      else line.setStatus(ProtocolStatus.INVALID);
     };
   }
   
   public Function<ReadMiss, DataLookup> getBidirectionalHandler() {
     return (ReadMiss event) -> {
-      var internalCacheLookup = readFromCache(event.blockNumber());
+      var internalCacheLookup = fetchRetained(event.blockNumber());
       var isLookupSuccessful = internalCacheLookup.isPresent();
 
       return new DataLookup(event.blockNumber(), isLookupSuccessful);
     };
+  }
+
+  private Optional<Line> fetchRetained(int blockNumber) {
+    for (var line : data.values()) {
+      boolean isPresent = (
+        line.getBlockNumber() == blockNumber &&
+        line.getStatus() != ProtocolStatus.INVALID
+      );
+
+      if (isPresent) return Optional.of(line);
+    }
+
+    return Optional.empty();
   }
 }
