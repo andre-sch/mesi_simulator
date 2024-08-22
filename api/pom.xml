@@ -9,7 +9,7 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
-  <groupId>com.cinema_reservations</groupId>
+  <groupId>com.mesi_simulator</groupId>
   <artifactId>api</artifactId>
   <version>1.0.0</version>
 
