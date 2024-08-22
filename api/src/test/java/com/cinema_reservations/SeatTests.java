@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SeatTests {
   private final long availableStatusCode = 0;
-  private final long reservedStatusCode = 2;
+  private final long reservedStatusCode = 1;
 
   @Test
   public void serialization() {
