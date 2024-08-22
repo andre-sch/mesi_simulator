@@ -56,16 +56,11 @@ export class OutputRenderer {
       var button = document.createElement("button");
       button.className = "select-room";
       button.textContent = `Sala ${roomId}`;
-      button.onclick = this.selectOption.bind(this, roomId);
+      button.onclick = selectRoom.bind(this, roomId, this.processorId);
       options.appendChild(button);
     }
 
     return [header, options];
-  }
-
-  private async selectOption(roomId: number): Promise<void> {
-    var room = await selectRoom(roomId, this.processorId);
-    this.update(this.roomPage(room));
   }
 
   private roomPage(roomData: Room): Element[] {

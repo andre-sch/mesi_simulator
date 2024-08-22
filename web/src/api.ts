@@ -8,6 +8,10 @@ var api = axios.create({
 });
 
 var numberOfProcessors = 3;
+var renderedCaches = new Map<number, number>();
+
+var response = await api.get<{ count: number }>(`/rooms/count`);
+var roomCount = response.data.count;
 
 async function renderMemory(): Promise<void> {
   var memoryRenderer = new MemoryRenderer();
@@ -27,33 +31,47 @@ async function createProcessor(): Promise<number> {
 }
 
 async function renderOutput(processorId: number, newContent?: Room) {
-  var response = await api.get<{ count: number }>(`/rooms/count`);
-  var outputRenderer = new OutputRenderer(processorId, response.data.count);
+  var outputRenderer = new OutputRenderer(processorId, roomCount);
   outputRenderer.render(newContent);
 }
 
-async function selectRoom(roomId: number, processorId: number): Promise<Room> {
+async function selectRoom(roomId: number, processorId: number): Promise<void> {
   var response = await api.put<Room>(`/rooms/${roomId}`, { processorId });
   var room = response.data;
 
-  renderMemory();
-  renderCache(processorId);
-  renderOutput(processorId, room);
-
-  return room;
+  renderRoomUpdate(room, processorId);
 }
 
 async function reserveSeat(roomId: number, seatId: number, processorId: number): Promise<void> {
-  await api.put(`/rooms/${roomId}/seats/${seatId}/reserve`, { processorId });
-  selectRoom(roomId, processorId);
+  var response = await api.put<Room>(`/rooms/${roomId}/seats/${seatId}/reserve`, { processorId });
+  var room = response.data;
+
+  renderRoomUpdate(room, processorId);
+}
+
+function renderRoomUpdate(room: Room, processorId: number): void {
+  renderMemory();
+
+  renderedCaches.set(processorId, room.id);
+  renderCachesRelatedToRoom(room.id);
+
+  renderOutput(processorId, room);
+}
+
+function renderCachesRelatedToRoom(roomId: number) {
+  renderedCaches.forEach((renderedRoomId, renderedProcessorId) => {
+    if (renderedRoomId == roomId) renderCache(renderedProcessorId);
+  });
 }
 
 async function getCacheContent(id: number): Promise<Line[]> {
-  return (await api.get<Line[]>(`/caches/${id}`)).data;
+  var response = await api.get<Line[]>(`/caches/${id}`);
+  return response.data;
 }
 
 async function getMemoryContent(): Promise<number[]> {
-  return (await api.get<number[]>("/shared-memory")).data;
+  var response = await api.get<number[]>("/shared-memory");
+  return response.data;
 }
 
 export {

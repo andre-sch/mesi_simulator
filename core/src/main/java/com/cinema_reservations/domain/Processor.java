@@ -1,7 +1,6 @@
 package com.cinema_reservations.domain;
 
 import java.util.List;
-import java.util.LinkedList;
 
 public class Processor {
   private RoomDeserializer roomDeserializer = new RoomDeserializer();
@@ -26,16 +25,13 @@ public class Processor {
     int firstBlockNumber = context.blockNumberOf(roomId);
     int lastBlockNumber = firstBlockNumber + context.blocksPerRoom() - 1;
 
-    List<List<Long>> serialization = new LinkedList<>();
-    for (int i = firstBlockNumber; i <= lastBlockNumber; i++) {
-      List<Long> block = cache.readBlock(i);
-      serialization.add(block);
-    }
+    for (int i = firstBlockNumber; i <= lastBlockNumber; i++)
+      cache.readBlock(i);
 
-    return roomDeserializer.deserialize(serialization);
+    return roomDeserializer.deserialize(cache.getRetainedBlocks());
   }
 
-  public void reserveSeat(int roomId, int seatNumber) {
+  public Room reserveSeat(int roomId, int seatNumber) {
     int blockNumber = context.blockNumberOf(roomId);
     blockNumber += context.blocksPerHeader();
 
@@ -53,5 +49,6 @@ public class Processor {
     block.set(blockSeatIndex, reservedSeat.serialize());
 
     cache.writeBlock(blockNumber, block);
+    return roomDeserializer.deserialize(cache.getRetainedBlocks());
   }
 }

@@ -1,7 +1,7 @@
 package com.cinema_reservations.application;
 
+import com.cinema_reservations.domain.Room;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
 
 @RestController
 public class RoomReservationController {
@@ -12,14 +12,14 @@ public class RoomReservationController {
   }
 
   @PutMapping("/rooms/{roomId}/seats/{seatId}/reserve")
-  @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void putMethodName(
+  public Room putMethodName(
     @RequestBody Request request,
     @PathVariable int roomId,
     @PathVariable int seatId
   ) {
     var processor = processingProvider.getProcessor(request.processorId);
-    processor.reserveSeat(roomId, seatId);
+    var modifiedRoom = processor.reserveSeat(roomId, seatId);
+    return modifiedRoom;
   }
 
   private static record Request(int processorId) {}

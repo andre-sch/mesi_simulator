@@ -35,6 +35,13 @@ public class Cache {
     return dataCopy;
   }
 
+  public List<List<Long>> getRetainedBlocks() {
+    var lines = getContent();
+    return lines.stream()
+      .map(Line::getContent)
+      .toList();
+  }
+
   public void writeBlock(int blockNumber, List<Long> newContent) {
     Line line;
     Optional<Line> internalCacheLookup = readFromCache(blockNumber);
