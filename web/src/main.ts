@@ -1,15 +1,3 @@
-import {
-  numberOfProcessors,
-  renderCache,
-  renderMemory,
-  renderOutput
-} from "./api";
+import { renderInterface } from "./api";
 
-window.addEventListener("load", async () => {
-  renderMemory();
-
-  for (var processorId = 0; processorId < numberOfProcessors; processorId++) {
-    renderCache(processorId);
-    renderOutput(processorId);
-  }
-})
+window.addEventListener("load", renderInterface);

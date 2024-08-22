@@ -7,25 +7,17 @@ var api = axios.create({
   baseURL: "http://localhost:8080"
 });
 
-var numberOfProcessors = 3;
+var processorIds = [0, 1, 2];
 var response = await api.get<{ count: number }>(`/rooms/count`);
 var roomCount = response.data.count;
 
-async function renderMemory(): Promise<void> {
-  var memoryRenderer = new MemoryRenderer();
-  var content = await getMemoryContent();
-  memoryRenderer.render(content);
-}
+async function renderInterface() {
+  renderMemory();
 
-async function renderCache(id: number): Promise<void> {
-  var cacheRenderer = new CacheRenderer(id);
-  var content = await getCacheContent(id);
-  cacheRenderer.render(content);
-}
-
-async function renderOutput(processorId: number, newContent?: Room) {
-  var outputRenderer = new OutputRenderer(processorId, roomCount);
-  outputRenderer.render(newContent);
+  processorIds.forEach(id => {
+    renderCache(id);
+    renderOutput(id);
+  });
 }
 
 async function selectRoom(roomId: number, processorId: number): Promise<void> {
@@ -44,18 +36,14 @@ async function reserveSeat(roomId: number, seatId: number, processorId: number):
 
 function renderRoomUpdate(room: Room, processorId: number): void {
   renderMemory();
-  renderCaches();
+  processorIds.forEach(id => renderCache(id));
   renderOutput(processorId, room);
 }
 
-function renderCaches() {
-  for (var processorId = 0; processorId < numberOfProcessors; processorId++)
-    renderCache(processorId);
-}
-
-async function getCacheContent(id: number): Promise<Line[]> {
-  var response = await api.get<Line[]>(`/caches/${id}`);
-  return response.data;
+async function renderMemory(): Promise<void> {
+  var memoryRenderer = new MemoryRenderer();
+  var content = await getMemoryContent();
+  memoryRenderer.render(content);
 }
 
 async function getMemoryContent(): Promise<number[]> {
@@ -63,11 +51,24 @@ async function getMemoryContent(): Promise<number[]> {
   return response.data;
 }
 
+async function renderCache(id: number): Promise<void> {
+  var cacheRenderer = new CacheRenderer(id);
+  var content = await getCacheContent(id);
+  cacheRenderer.render(content);
+}
+
+async function getCacheContent(id: number): Promise<Line[]> {
+  var response = await api.get<Line[]>(`/caches/${id}`);
+  return response.data;
+}
+
+async function renderOutput(processorId: number, newContent?: Room) {
+  var outputRenderer = new OutputRenderer(processorId, roomCount);
+  outputRenderer.render(newContent);
+}
+
 export {
-  numberOfProcessors,
-  renderMemory,
-  renderCache,
-  renderOutput,
-  selectRoom,
+  renderInterface,
+  selectRoom ,
   reserveSeat
 };
