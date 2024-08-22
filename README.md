@@ -13,7 +13,7 @@ Objetos: Salas e Assentos.
 ### Assentos
 
 - Uma posição na matriz de uma sala.
-- Possui um conjunto de estados quanto a reserva { Disponível, Selecionado, Reservado }.
+- Possui um conjunto de estados quanto a reserva { Disponível, Reservado }.
 
 ```mermaid
 classDiagram
@@ -32,7 +32,6 @@ classDiagram
     class Estado_Reserva {
       <<enumeration>>
       Disponível
-      Selecionado
       Reservado
     }
   }
@@ -50,12 +49,7 @@ Cada usuário do sistema é associado a um processador/cache.
 O usuário pode realizar as seguintes ações:
 
 - Listar assentos de uma sala, incluindo o estado quanto a reserva
-- Selecionar um assento*
-- Cancelar uma seleção
 - Efetivar uma reserva
-
-*A seleção de um assento torna a sua reserva exclusiva a um usuário por tempo limitado.
-Após um tempo de expiração, o assento volta a ser disponível.
 
 ### Processadores
 
